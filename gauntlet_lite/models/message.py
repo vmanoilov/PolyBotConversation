@@ -39,7 +39,8 @@ class Message:
     
     def __repr__(self):
         target = f" -> {self.to}" if self.to else ""
-        return f"Message(from={self.from_}{target}, content='{self.content[:50]}...')"
+        content_preview = self.content[:50] + "..." if len(self.content) > 50 else self.content
+        return f"Message(from={self.from_}{target}, content='{content_preview}')"
     
     def __str__(self):
         return f"[{self.from_}]: {self.content}"

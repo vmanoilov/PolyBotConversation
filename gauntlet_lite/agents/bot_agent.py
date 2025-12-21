@@ -171,12 +171,12 @@ Important guidelines:
         Returns:
             True if bot should respond
         """
-        # Don't respond to own messages
-        if message.from_ == self.name:
+        # Don't respond to own messages (check both name and ID for consistency)
+        if message.from_ == self.name or message.from_ == self.id:
             return False
         
         # Don't respond if we just responded
-        if context.messages and context.messages[-1].from_ == self.name:
+        if context.messages and (context.messages[-1].from_ == self.name or context.messages[-1].from_ == self.id):
             return False
         
         return True

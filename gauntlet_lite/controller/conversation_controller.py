@@ -128,6 +128,7 @@ class ConversationController:
         
         # Process turns
         turn_count = 0
+        no_response_count = 0
         while turn_count < max_turns:
             response = self.process_turn()
             
@@ -135,21 +136,15 @@ class ConversationController:
                 if verbose:
                     print(f"{response}\n")
                 turn_count += 1
+                no_response_count = 0  # Reset counter on successful response
             else:
                 # No response generated, try next bot
-                pass
+                no_response_count += 1
             
             # Stop if we've cycled through all bots without any responses
-            if turn_count > 0 and turn_count % len(self.bots) == 0:
-                consecutive_no_response = True
-                for _ in range(len(self.bots)):
-                    if self.context.get_last_message().from_ != "user":
-                        consecutive_no_response = False
-                        break
-                
-                if consecutive_no_response:
-                    logger.info("No bots responding, ending conversation")
-                    break
+            if no_response_count >= len(self.bots):
+                logger.info("No bots responding after full cycle, ending conversation")
+                break
         
         if verbose:
             print(f"{'='*60}")
