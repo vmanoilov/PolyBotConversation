@@ -391,6 +391,27 @@ message = Message(
 
 ## Testing
 
+### Running the Test Suite
+
+To verify that everything is working correctly:
+
+```bash
+cd gauntlet_lite
+python test_suite.py
+```
+
+This runs a comprehensive test suite covering:
+- Message creation and formatting
+- Conversation context management
+- Bot agent behavior
+- Turn-taking logic
+- Message routing
+- Broadcast messaging
+- Conversation summaries
+- Reset functionality
+
+### Running the Demo
+
 Run the demo script to verify everything works:
 
 ```bash
