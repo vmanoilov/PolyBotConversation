@@ -1,0 +1,9 @@
+# GauntletFuse - Phase 0 (Lite) Requirements
+# Minimal dependencies for the multi-bot conversation framework
+
+# Optional: Only needed if you want to use real LLM instead of mock responses
+# Uncomment the line below if you want to enable LLM support
+# openai>=1.0.0
+
+# No other dependencies required!
+# The framework works out of the box with just Python 3.8+
