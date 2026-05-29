@@ -25,8 +25,33 @@ def get_system_prompt(conversation, bot):
         list_of_bots=conversation.list_of_bots(),
         list_of_humans=conversation.list_of_humans(),
         bot_prompt=bot.prompt,
-        core_memories=bot.get_core_memories_for_prompt(n_last_memories=settings.MAX_CORE_MEMORIES_PER_PROMPT),
+        core_memories=bot.get_core_memories_for_prompt(
+            n_last_memories=settings.MAX_CORE_MEMORIES_PER_PROMPT
+        ),
     )
     logger.debug(f"System Prompt: {system_promopt}")
 
     return system_promopt
+
+
+def get_formatted_conversation_messages(conversation):
+    from chat.models import Message
+
+    conversation_messages = Message.objects.filter(conversation=conversation).order_by(
+        "timestamp"
+    )
+    messages = []
+    for msg in conversation_messages:
+        role = "user" if msg.participant.participant_type == "user" else "assistant"
+        messages.append(
+            {
+                "role": role,
+                "name": (
+                    msg.participant.user.username
+                    if msg.participant.participant_type == "user"
+                    else msg.participant.bot.name
+                ),
+                "content": msg.message,
+            }
+        )
+    return messages
