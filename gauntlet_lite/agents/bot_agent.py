@@ -5,7 +5,7 @@ Each bot has a personality, memory, and can respond to messages.
 
 import os
 import logging
-from typing import List, Optional
+from typing import List
 from gauntlet_lite.models.message import Message
 from gauntlet_lite.models.conversation_state import ConversationContext
 
