@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 def check_turn(conversation, bot):
     messages = []
 
-    for msg in conversation.messages.all():
+    for msg in conversation.messages.select_related("participant__user", "participant__bot").order_by("timestamp"):
         role = "user" if msg.participant.participant_type == "user" else "assistant"
         messages.append(
             {

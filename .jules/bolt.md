@@ -1,0 +1,3 @@
+## 2024-05-29 - Fixed N+1 Query in `check_turn`
+**Learning:** Found an N+1 query vulnerability when iterating over `conversation.messages.all()` where participants are fetched repeatedly for each message. Since messages contain a related participant object that might be either a user or a bot, `participant__user` and `participant__bot` should be fetched via `select_related` ahead of time to drastically reduce DB query load, especially since the number of messages will scale up over time.
+**Action:** Use `.select_related("participant__user", "participant__bot").order_by("timestamp")` whenever iterating over a conversation's messages, similarly to how it's done in `chat/views.py`.
