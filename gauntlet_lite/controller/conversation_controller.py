@@ -122,7 +122,7 @@ class ConversationController:
         
         if verbose:
             print(f"\n{'='*60}")
-            print(f"Starting Conversation")
+            print("Starting Conversation")
             print(f"{'='*60}")
             print(f"{initial_msg}\n")
         
