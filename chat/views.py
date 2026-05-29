@@ -185,13 +185,16 @@ def manage_triggers_for_conversation(request, conversation_uuid):
 def chat_clear(request):
     conversations = Conversation.objects.all()
 
-    for conversation in conversations:
-        Schedule.objects.filter(name=f"generate_messages_{conversation.uuid}").delete()
+    # Bulk delete schedules
+    schedule_names = [f"generate_messages_{uuid}" for uuid in conversations.values_list('uuid', flat=True)]
+    if schedule_names:
+        Schedule.objects.filter(name__in=schedule_names).delete()
 
-        if settings.BUILD_CORE_MEMORIES:
+    if settings.BUILD_CORE_MEMORIES:
+        for conversation in conversations:
             async_task("chat.tasks.generate_core_memories", conversation)
 
-        conversation.delete()
+    conversations.delete()
 
     return redirect("chat:index")
 
