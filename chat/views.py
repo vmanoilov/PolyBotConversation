@@ -183,7 +183,7 @@ def manage_triggers_for_conversation(request, conversation_uuid):
 
 @login_required
 def chat_clear(request):
-    conversations = Conversation.objects.all()
+    conversations = Conversation.objects.filter(participants__user=request.user)
 
     for conversation in conversations:
         Schedule.objects.filter(name=f"generate_messages_{conversation.uuid}").delete()
