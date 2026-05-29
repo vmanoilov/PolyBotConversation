@@ -198,7 +198,7 @@ def chat_clear(request):
 
 @login_required
 def chat_delete(request, conversation_uuid):
-    conversation = get_object_or_404(Conversation, uuid=conversation_uuid)
+    conversation = get_object_or_404(Conversation, uuid=conversation_uuid, participants__user=request.user)
     Schedule.objects.filter(name=f"generate_messages_{conversation.uuid}").delete()
 
     if settings.BUILD_CORE_MEMORIES:
