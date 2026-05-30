@@ -4,11 +4,10 @@ Routes messages, manages turn-taking, and coordinates bot interactions.
 """
 
 import logging
-from typing import Dict, List, Optional
-
-from gauntlet_lite.agents.bot_agent import BotAgent
-from gauntlet_lite.models.conversation_state import ConversationContext
+from typing import List, Optional, Dict
 from gauntlet_lite.models.message import Message
+from gauntlet_lite.models.conversation_state import ConversationContext
+from gauntlet_lite.agents.bot_agent import BotAgent
 
 logger = logging.getLogger(__name__)
 
@@ -122,9 +121,9 @@ class ConversationController:
         self.add_message(initial_msg)
 
         if verbose:
-            print(f"\n{'=' * 60}")
-            print("Starting Conversation")
-            print(f"{'=' * 60}")
+            print(f"\n{'='*60}")
+            print(f"Starting Conversation")
+            print(f"{'='*60}")
             print(f"{initial_msg}\n")
 
         # Process turns
@@ -148,9 +147,9 @@ class ConversationController:
                 break
 
         if verbose:
-            print(f"{'=' * 60}")
+            print(f"{'='*60}")
             print(f"Conversation ended after {turn_count} turns")
-            print(f"{'=' * 60}\n")
+            print(f"{'='*60}\n")
 
     def broadcast_message(self, content: str, from_: str = "system") -> List[Message]:
         """
@@ -185,20 +184,20 @@ class ConversationController:
             Formatted string with conversation history
         """
         summary_lines = [
-            "=" * 60,
+            "="*60,
             "CONVERSATION SUMMARY",
-            "=" * 60,
+            "="*60,
             f"Total messages: {len(self.context.messages)}",
             f"Participants: {', '.join(sorted(self.context.participants))}",
             "",
             "Message History:",
-            "-" * 60,
+            "-"*60
         ]
 
         for msg in self.context.messages:
             summary_lines.append(f"[{msg.from_}]: {msg.content}")
 
-        summary_lines.append("=" * 60)
+        summary_lines.append("="*60)
 
         return "\n".join(summary_lines)
 

@@ -10,7 +10,7 @@ from pathlib import Path
 # Add parent directory to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from gauntlet_lite import BotAgent, ConversationContext, ConversationController, Message
+from gauntlet_lite import BotAgent, ConversationController, Message, ConversationContext
 
 
 def test_message_creation():
@@ -66,7 +66,13 @@ def test_bot_agent():
     """Test BotAgent creation and behavior."""
     print("Testing BotAgent...", end=" ")
 
-    bot = BotAgent(id="test-bot", name="TestBot", prompt="You are a test bot.", temperature=0.7, use_llm=False)
+    bot = BotAgent(
+        id="test-bot",
+        name="TestBot",
+        prompt="You are a test bot.",
+        temperature=0.7,
+        use_llm=False
+    )
 
     assert bot.id == "test-bot"
     assert bot.name == "TestBot"
@@ -94,21 +100,21 @@ def test_bot_should_respond():
 
     # Should respond to messages from others
     msg1 = Message(from_="user", content="Hello")
-    assert bot.should_respond(msg1, context)
+    assert bot.should_respond(msg1, context) == True
 
     # Should not respond to own messages (by name)
     msg2 = Message(from_="Bot1", content="Test")
-    assert not bot.should_respond(msg2, context)
+    assert bot.should_respond(msg2, context) == False
 
     # Should not respond to own messages (by ID)
     msg3 = Message(from_="bot1", content="Test")
-    assert not bot.should_respond(msg3, context)
+    assert bot.should_respond(msg3, context) == False
 
     # Should not respond if just responded
     context.add_message(Message(from_="user", content="Hi"))
     context.add_message(Message(from_="Bot1", content="Response"))
     msg4 = Message(from_="user", content="Another message")
-    assert not bot.should_respond(msg4, context)
+    assert bot.should_respond(msg4, context) == False
 
     print("✓")
 
@@ -154,7 +160,11 @@ def test_conversation_flow():
     controller.register_bot(bot2)
 
     # Run conversation
-    controller.run_conversation(initial_message="Let's discuss testing.", max_turns=4, verbose=False)
+    controller.run_conversation(
+        initial_message="Let's discuss testing.",
+        max_turns=4,
+        verbose=False
+    )
 
     # Should have initial message + 4 bot responses
     assert len(controller.context) >= 5
@@ -250,9 +260,9 @@ def test_targeted_messaging():
 
 def run_all_tests():
     """Run all test functions."""
-    print("\n" + "=" * 70)
+    print("\n" + "="*70)
     print("GauntletFuse Phase 0 - Test Suite")
-    print("=" * 70 + "\n")
+    print("="*70 + "\n")
 
     test_functions = [
         test_message_creation,
@@ -275,15 +285,15 @@ def run_all_tests():
             print(f"✗ FAILED: {e}")
             failed += 1
 
-    print("\n" + "=" * 70)
+    print("\n" + "="*70)
     if failed == 0:
         print("ALL TESTS PASSED ✅")
-        print("=" * 70)
+        print("="*70)
         print("\nGauntletFuse Phase 0 is working correctly!")
         return 0
     else:
         print(f"{failed} TEST(S) FAILED ❌")
-        print("=" * 70)
+        print("="*70)
         return 1
 
 

@@ -3,12 +3,11 @@ BotAgent abstraction for bot-to-bot conversations.
 Each bot has a personality, memory, and can respond to messages.
 """
 
-import logging
 import os
-from typing import List
-
-from gauntlet_lite.models.conversation_state import ConversationContext
+import logging
+from typing import List, Optional
 from gauntlet_lite.models.message import Message
+from gauntlet_lite.models.conversation_state import ConversationContext
 
 logger = logging.getLogger(__name__)
 
@@ -34,7 +33,15 @@ class BotAgent:
         use_llm: Whether to use real LLM or mock responses
     """
 
-    def __init__(self, id: str, name: str, prompt: str, model: str = "gpt-3.5-turbo", temperature: float = 0.7, use_llm: bool = False):
+    def __init__(
+        self,
+        id: str,
+        name: str,
+        prompt: str,
+        model: str = "gpt-3.5-turbo",
+        temperature: float = 0.7,
+        use_llm: bool = False
+    ):
         self.id = id
         self.name = name
         self.prompt = prompt
@@ -47,7 +54,6 @@ class BotAgent:
         if self.use_llm:
             try:
                 import openai
-
                 self.openai = openai
                 self.api_key = os.environ.get("OPENAI_API_KEY")
                 if not self.api_key:
@@ -77,7 +83,11 @@ class BotAgent:
             response_content = self._generate_mock_response(input_message, context)
 
         # Create and return response message
-        response = Message(from_=self.name, content=response_content, meta={"bot_id": self.id})
+        response = Message(
+            from_=self.name,
+            content=response_content,
+            meta={"bot_id": self.id}
+        )
 
         self.memory.append(response)
         return response
@@ -88,13 +98,22 @@ class BotAgent:
             client = self.openai.OpenAI(api_key=self.api_key)
 
             # Build messages for LLM
-            messages = [{"role": "system", "content": self._build_system_prompt(context)}]
+            messages = [
+                {
+                    "role": "system",
+                    "content": self._build_system_prompt(context)
+                }
+            ]
 
             # Add conversation history
             messages.extend(context.get_history_for_llm(bot_name=self.name))
 
             # Call LLM
-            response = client.chat.completions.create(model=self.model, temperature=self.temperature, messages=messages)
+            response = client.chat.completions.create(
+                model=self.model,
+                temperature=self.temperature,
+                messages=messages
+            )
 
             return response.choices[0].message.content
 
@@ -110,8 +129,8 @@ class BotAgent:
         responses = [
             f"Interesting point about '{input_message.content[:30]}...'. I'd like to add my perspective.",
             f"I see what you mean, {input_message.from_}. From my viewpoint, that's quite insightful.",
-            "Building on that thought - I think there's more to consider here.",
-            "That's a valid observation. Let me contribute to this discussion.",
+            f"Building on that thought - I think there's more to consider here.",
+            f"That's a valid observation. Let me contribute to this discussion.",
             f"I appreciate your input, {input_message.from_}. Here's my take on this.",
         ]
 

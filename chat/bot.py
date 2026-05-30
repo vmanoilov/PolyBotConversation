@@ -2,11 +2,7 @@ import logging
 
 from django.conf import settings
 
-from chat.helpers import (
-    get_system_prompt,
-    judge_bot_determination,
-    get_formatted_conversation_messages,
-)
+from chat.helpers import get_system_prompt, judge_bot_determination
 from chat.llm import prompt_llm_messages
 from chat.models import Message
 from chat.prompt_templates import prompts
@@ -15,7 +11,17 @@ logger = logging.getLogger(__name__)
 
 
 def check_turn(conversation, bot):
-    messages = get_formatted_conversation_messages(conversation)
+    messages = []
+
+    for msg in conversation.messages.all():
+        role = "user" if msg.participant.participant_type == "user" else "assistant"
+        messages.append(
+            {
+                "role": role,
+                "name": msg.participant.user.username if msg.participant.participant_type == "user" else msg.participant.bot.name,
+                "content": msg.message,
+            }
+        )
 
     # Human goes first
     if len(messages) == 0:
@@ -28,21 +34,13 @@ def check_turn(conversation, bot):
 
         # Make sure the user has replied enough times; but allow answers after a user has replied
         human_replies = [msg for msg in messages[-10:] if msg["role"] == "user"]
-        if (
-            len(human_replies) < settings.MIN_HUMAN_REPLIES_LAST_10
-            and len(messages) > settings.NEW_CHAT_GRACE
-            and messages[-1]["role"] != "user"
-        ):
-            logger.info(
-                f"User has not replied enough times ({len(human_replies)} < {settings.MIN_HUMAN_REPLIES_LAST_10})"
-            )
+        if len(human_replies) < settings.MIN_HUMAN_REPLIES_LAST_10 and len(messages) > settings.NEW_CHAT_GRACE and messages[-1]["role"] != "user":
+            logger.info(f"User has not replied enough times ({len(human_replies)} < {settings.MIN_HUMAN_REPLIES_LAST_10})")
             return False
 
         bot_replies = [msg for msg in messages[-10:] if msg["name"] == bot.name]
         if len(bot_replies) >= settings.MAX_THIS_BOT_REPLIES_LAST_10:
-            logger.info(
-                f"Bot has replied too many times ({len(bot_replies)} >= {settings.MAX_THIS_BOT_REPLIES_LAST_10})"
-            )
+            logger.info(f"Bot has replied too many times ({len(bot_replies)} >= {settings.MAX_THIS_BOT_REPLIES_LAST_10})")
             return False
 
     return True
@@ -66,7 +64,19 @@ def generate_message_mention(conversation, message, bot):
 
     messages = [{"role": "system", "name": "system", "content": system_prompt}]
 
-    messages.extend(get_formatted_conversation_messages(conversation))
+    # Retrieve all messages for the conversation ordered by timestamp
+    conversation_messages = Message.objects.filter(conversation=conversation).order_by("timestamp")
+
+    # Convert each message into the format required by OpenAI
+    for msg in conversation_messages:
+        role = "user" if msg.participant.participant_type == "user" else "assistant"
+        messages.append(
+            {
+                "role": role,
+                "name": msg.participant.user.username if msg.participant.participant_type == "user" else msg.participant.bot.name,
+                "content": msg.message,
+            }
+        )
 
     messages.append(
         {
@@ -76,14 +86,10 @@ def generate_message_mention(conversation, message, bot):
         }
     )
 
-    bot_response = prompt_llm_messages(
-        messages, model=bot.model, temperature=bot.temperature
-    )
+    bot_response = prompt_llm_messages(messages, model=bot.model, temperature=bot.temperature)
 
     if not check_message(bot_response, bot):
-        logger.info(
-            f"[Mention] Failed 'check_message' for {bot.name}. Bot response: {bot_response}"
-        )
+        logger.info(f"[Mention] Failed 'check_message' for {bot.name}. Bot response: {bot_response}")
         return False
 
     logger.info(f"[Mention] Generating a new message as {bot.name}")
@@ -103,7 +109,19 @@ def generate_message_general(conversation, bot):
 
     messages = [{"role": "system", "name": "system", "content": system_prompt}]
 
-    messages.extend(get_formatted_conversation_messages(conversation))
+    # Retrieve all messages for the conversation ordered by timestamp
+    conversation_messages = Message.objects.filter(conversation=conversation).order_by("timestamp")
+
+    # Convert each message into the format required by OpenAI
+    for msg in conversation_messages:
+        role = "user" if msg.participant.participant_type == "user" else "assistant"
+        messages.append(
+            {
+                "role": role,
+                "name": msg.participant.user.username if msg.participant.participant_type == "user" else msg.participant.bot.name,
+                "content": msg.message,
+            }
+        )
 
     messages.append(
         {
@@ -127,14 +145,10 @@ def generate_message_general(conversation, bot):
             }
         )
 
-        bot_response = prompt_llm_messages(
-            messages, model=bot.model, temperature=bot.temperature
-        )
+        bot_response = prompt_llm_messages(messages, model=bot.model, temperature=bot.temperature)
 
         if not check_message(bot_response, bot):
-            logger.info(
-                f"[Mention] Failed 'check_message' for {bot.name}. Bot response: {bot_response}"
-            )
+            logger.info(f"[Mention] Failed 'check_message' for {bot.name}. Bot response: {bot_response}")
             return False
 
         logger.info(f"[General] Generating a new message as {bot.name}")
@@ -144,6 +158,4 @@ def generate_message_general(conversation, bot):
             message=bot_response,
         )
     else:
-        logger.info(
-            f"[General] Not generating a new message as {bot.name}. Bot response: {bot_response}"
-        )
+        logger.info(f"[General] Not generating a new message as {bot.name}. Bot response: {bot_response}")
