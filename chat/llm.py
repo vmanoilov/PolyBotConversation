@@ -84,7 +84,7 @@ def llm_form_core_memories(conversation, bot):
         return False
 
     # Only generate core memories if there are at least 5 messages in the conversation
-    if conversation.messages.count() < 5:
+    if len(conversation.messages.all()) < 5:
         logger.info(f"Conversation {conversation.uuid} has less than 5 messages, skipping core memory generation")
         return False
 
