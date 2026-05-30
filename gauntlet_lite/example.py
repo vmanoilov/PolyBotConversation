@@ -21,11 +21,18 @@ def main():
     optimist = BotAgent(
         id="optimist-1",
         name="Optimist",
-        prompt="You are an optimistic bot who sees the positive side of things. You're encouraging and forward-thinking.",
-        use_llm=False,  # Use mock responses (no API key needed)
+        prompt="You are an optimistic bot who sees the positive side of things. "
+               "You're encouraging and forward-thinking.",
+        use_llm=False  # Use mock responses (no API key needed)
     )
 
-    realist = BotAgent(id="realist-1", name="Realist", prompt="You are a realistic bot who focuses on practical concerns. You're grounded and analytical.", use_llm=False)
+    realist = BotAgent(
+        id="realist-1",
+        name="Realist",
+        prompt="You are a realistic bot who focuses on practical concerns. "
+               "You're grounded and analytical.",
+        use_llm=False
+    )
 
     # Step 2: Create conversation controller
     controller = ConversationController()
@@ -35,11 +42,15 @@ def main():
     controller.register_bot(realist)
 
     # Step 4: Start conversation
-    print("\n" + "=" * 60)
+    print("\n" + "="*60)
     print("Simple Bot Conversation Example")
-    print("=" * 60 + "\n")
+    print("="*60 + "\n")
 
-    controller.run_conversation(initial_message="What do you think about the future of technology?", max_turns=6, verbose=True)
+    controller.run_conversation(
+        initial_message="What do you think about the future of technology?",
+        max_turns=6,
+        verbose=True
+    )
 
     # Optional: Print summary
     print("\n" + controller.get_conversation_summary())

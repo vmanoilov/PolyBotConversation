@@ -21,7 +21,15 @@ class Message:
         meta: Optional metadata dictionary
     """
 
-    def __init__(self, from_: str, content: str, to: Optional[str] = None, id: Optional[str] = None, timestamp: Optional[float] = None, meta: Optional[dict] = None):
+    def __init__(
+        self,
+        from_: str,
+        content: str,
+        to: Optional[str] = None,
+        id: Optional[str] = None,
+        timestamp: Optional[float] = None,
+        meta: Optional[dict] = None
+    ):
         self.id = id or str(uuid.uuid4())
         self.from_ = from_
         self.to = to
@@ -39,4 +47,11 @@ class Message:
 
     def to_dict(self):
         """Convert message to dictionary format."""
-        return {"id": self.id, "from": self.from_, "to": self.to, "content": self.content, "timestamp": self.timestamp, "meta": self.meta}
+        return {
+            "id": self.id,
+            "from": self.from_,
+            "to": self.to,
+            "content": self.content,
+            "timestamp": self.timestamp,
+            "meta": self.meta
+        }
