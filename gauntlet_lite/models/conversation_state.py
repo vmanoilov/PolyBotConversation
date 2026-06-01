@@ -4,7 +4,6 @@ Holds the shared conversation history and context.
 """
 
 from typing import List, Optional
-
 from gauntlet_lite.models.message import Message
 
 

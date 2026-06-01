@@ -10,9 +10,9 @@ Intelligence comes later.
 
 __version__ = "0.1.0"
 
+from gauntlet_lite.models import Message, ConversationContext
 from gauntlet_lite.agents import BotAgent
 from gauntlet_lite.controller import ConversationController
-from gauntlet_lite.models import ConversationContext, Message
 
 __all__ = [
     "Message",
