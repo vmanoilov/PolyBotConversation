@@ -10,8 +10,7 @@ from pathlib import Path
 # Add parent directory to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from gauntlet_lite import (BotAgent, ConversationContext,
-                           ConversationController, Message)
+from gauntlet_lite import BotAgent, ConversationController, Message, ConversationContext
 
 
 def test_message_creation():

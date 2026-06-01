@@ -1,4 +1,3 @@
-from django.db.models import Max
 from django_q.tasks import async_task
 
 from chat.llm import llm_conversation_title, llm_form_core_memories
@@ -7,13 +6,11 @@ from chat.triggers import general, mention
 
 
 def update_conversation_titles():
-    conversations = Conversation.objects.annotate(last_message_timestamp=Max("messages__timestamp"))
+    conversations = Conversation.objects.all()
 
     for conversation in conversations:
         try:
-            if conversation.last_message_timestamp is None:
-                continue
-            if conversation.last_message_timestamp > conversation.title_update_date or conversation.title is None:
+            if conversation.messages.last().timestamp > conversation.title_update_date or conversation.title is None:
                 llm_conversation_title(conversation)
         except AttributeError:
             pass
