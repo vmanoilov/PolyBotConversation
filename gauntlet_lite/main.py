@@ -28,10 +28,10 @@ from gauntlet_lite import BotAgent, ConversationController
 def create_demo_bots(use_llm=False):
     """
     Create demo bots with different personalities.
-    
+
     Args:
         use_llm: Whether to use real LLM (requires OPENAI_API_KEY) or mock responses
-        
+
     Returns:
         List of BotAgent instances
     """
@@ -45,7 +45,7 @@ You value efficiency and clear thinking.""",
         temperature=0.7,
         use_llm=use_llm
     )
-    
+
     bot_beta = BotAgent(
         id="bot-beta",
         name="Beta",
@@ -56,7 +56,7 @@ You value innovation and creative problem-solving.""",
         temperature=0.9,
         use_llm=use_llm
     )
-    
+
     bot_gamma = BotAgent(
         id="bot-gamma",
         name="Gamma",
@@ -67,7 +67,7 @@ You value collaboration and consensus-building.""",
         temperature=0.8,
         use_llm=use_llm
     )
-    
+
     return [bot_alpha, bot_beta, bot_gamma]
 
 
@@ -77,15 +77,15 @@ def demo_simple_conversation():
     print("DEMO 1: Simple Round-Robin Conversation")
     print("="*70)
     print("Three bots discussing a topic with fixed turn-taking.\n")
-    
+
     # Create controller and bots
     controller = ConversationController()
     bots = create_demo_bots(use_llm=False)  # Use mock responses
-    
+
     # Register bots
     for bot in bots:
         controller.register_bot(bot)
-    
+
     # Run conversation
     controller.run_conversation(
         initial_message="Let's discuss the future of artificial intelligence and how it might impact society.",
@@ -100,15 +100,15 @@ def demo_targeted_conversation():
     print("DEMO 2: Multi-Turn Conversation")
     print("="*70)
     print("Multiple rounds of bot interactions.\n")
-    
+
     # Create controller and bots (only 2 for this demo)
     controller = ConversationController()
     bots = create_demo_bots(use_llm=False)[:2]  # Just Alpha and Beta
-    
+
     # Register bots
     for bot in bots:
         controller.register_bot(bot)
-    
+
     # First topic
     print("\n--- Round 1: Initial Topic ---\n")
     controller.run_conversation(
@@ -116,14 +116,14 @@ def demo_targeted_conversation():
         max_turns=4,
         verbose=True
     )
-    
+
     # Follow-up topic
     print("\n--- Round 2: Follow-up Question ---\n")
     from gauntlet_lite.models import Message
     follow_up = Message(from_="user", content="How would you prioritize these challenges?")
     controller.add_message(follow_up)
     print(f"[user]: {follow_up.content}\n")
-    
+
     # Continue conversation
     for _ in range(4):
         response = controller.process_turn()
@@ -137,21 +137,21 @@ def demo_conversation_summary():
     print("DEMO 3: Conversation with Summary")
     print("="*70)
     print("Running a conversation and displaying a summary.\n")
-    
+
     # Create controller with all bots
     controller = ConversationController()
     bots = create_demo_bots(use_llm=False)
-    
+
     for bot in bots:
         controller.register_bot(bot)
-    
+
     # Run conversation (less verbose this time)
     controller.run_conversation(
         initial_message="What makes a good software architecture?",
         max_turns=6,
         verbose=False
     )
-    
+
     # Print summary
     print(controller.get_conversation_summary())
 
@@ -163,14 +163,14 @@ def demo_with_llm():
     print("="*70)
     print("Using actual OpenAI API for responses.")
     print("NOTE: Requires OPENAI_API_KEY environment variable to be set.\n")
-    
+
     # Create controller with LLM-enabled bots
     controller = ConversationController()
     bots = create_demo_bots(use_llm=True)[:2]  # Just 2 bots to save API calls
-    
+
     for bot in bots:
         controller.register_bot(bot)
-    
+
     # Run shorter conversation to save API costs
     controller.run_conversation(
         initial_message="What's more important in software: simplicity or flexibility?",
@@ -188,16 +188,16 @@ def main():
     print("║" + "  Multi-Bot Conversation Framework Demo".center(68) + "║")
     print("║" + " "*68 + "║")
     print("╚" + "="*68 + "╝")
-    
+
     # Run demos
     demo_simple_conversation()
-    
+
     input("\n\nPress Enter to continue to Demo 2...")
     demo_targeted_conversation()
-    
+
     input("\n\nPress Enter to continue to Demo 3...")
     demo_conversation_summary()
-    
+
     # Ask about LLM demo
     print("\n" + "="*70)
     response = input("\nWould you like to try Demo 4 with real LLM? (requires OPENAI_API_KEY) [y/N]: ")
@@ -205,11 +205,11 @@ def main():
         demo_with_llm()
     else:
         print("\nSkipping LLM demo. Set OPENAI_API_KEY environment variable to enable.")
-    
+
     print("\n" + "="*70)
     print("All demos complete!")
     print("="*70 + "\n")
-    
+
     print("\nTo add your own bot:")
     print("  1. Create a BotAgent with a unique ID, name, and personality prompt")
     print("  2. Register it with a ConversationController")
