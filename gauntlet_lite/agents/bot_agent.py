@@ -3,11 +3,12 @@ BotAgent abstraction for bot-to-bot conversations.
 Each bot has a personality, memory, and can respond to messages.
 """
 
-import os
 import logging
-from typing import List, Optional
-from gauntlet_lite.models.message import Message
+import os
+from typing import List
+
 from gauntlet_lite.models.conversation_state import ConversationContext
+from gauntlet_lite.models.message import Message
 
 logger = logging.getLogger(__name__)
 
@@ -129,8 +130,8 @@ class BotAgent:
         responses = [
             f"Interesting point about '{input_message.content[:30]}...'. I'd like to add my perspective.",
             f"I see what you mean, {input_message.from_}. From my viewpoint, that's quite insightful.",
-            f"Building on that thought - I think there's more to consider here.",
-            f"That's a valid observation. Let me contribute to this discussion.",
+            "Building on that thought - I think there's more to consider here.",
+            "That's a valid observation. Let me contribute to this discussion.",
             f"I appreciate your input, {input_message.from_}. Here's my take on this.",
         ]
 
