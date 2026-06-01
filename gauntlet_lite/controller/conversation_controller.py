@@ -4,11 +4,10 @@ Routes messages, manages turn-taking, and coordinates bot interactions.
 """
 
 import logging
-from typing import Dict, List, Optional
-
-from gauntlet_lite.agents.bot_agent import BotAgent
-from gauntlet_lite.models.conversation_state import ConversationContext
+from typing import List, Optional, Dict
 from gauntlet_lite.models.message import Message
+from gauntlet_lite.models.conversation_state import ConversationContext
+from gauntlet_lite.agents.bot_agent import BotAgent
 
 logger = logging.getLogger(__name__)
 

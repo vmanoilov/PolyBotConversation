@@ -52,7 +52,7 @@ def prompt_llm_messages(
 
 def llm_conversation_title(conversation):
     try:
-        conversation_text = "\n".join([msg.message for msg in conversation.messages.all()])
+        conversation_text = "\n".join([msg.message for msg in conversation.messages.all().select_related('participant__user', 'participant__bot')])
 
         messages = [
             {

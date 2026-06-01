@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 def check_turn(conversation, bot):
     messages = []
 
-    for msg in conversation.messages.all().select_related("participant__user", "participant__bot"):
+    for msg in conversation.messages.all().select_related('participant__user', 'participant__bot'):
         role = "user" if msg.participant.participant_type == "user" else "assistant"
         messages.append(
             {
@@ -65,11 +65,7 @@ def generate_message_mention(conversation, message, bot):
     messages = [{"role": "system", "name": "system", "content": system_prompt}]
 
     # Retrieve all messages for the conversation ordered by timestamp
-    conversation_messages = (
-        Message.objects.filter(conversation=conversation)
-        .order_by("timestamp")
-        .select_related("participant__user", "participant__bot")
-    )
+    conversation_messages = Message.objects.filter(conversation=conversation).order_by("timestamp").select_related('participant__user', 'participant__bot')
 
     # Convert each message into the format required by OpenAI
     for msg in conversation_messages:
@@ -114,11 +110,7 @@ def generate_message_general(conversation, bot):
     messages = [{"role": "system", "name": "system", "content": system_prompt}]
 
     # Retrieve all messages for the conversation ordered by timestamp
-    conversation_messages = (
-        Message.objects.filter(conversation=conversation)
-        .order_by("timestamp")
-        .select_related("participant__user", "participant__bot")
-    )
+    conversation_messages = Message.objects.filter(conversation=conversation).order_by("timestamp").select_related('participant__user', 'participant__bot')
 
     # Convert each message into the format required by OpenAI
     for msg in conversation_messages:
