@@ -3,12 +3,11 @@ BotAgent abstraction for bot-to-bot conversations.
 Each bot has a personality, memory, and can respond to messages.
 """
 
-import logging
 import os
+import logging
 from typing import List
-
-from gauntlet_lite.models.conversation_state import ConversationContext
 from gauntlet_lite.models.message import Message
+from gauntlet_lite.models.conversation_state import ConversationContext
 
 logger = logging.getLogger(__name__)
 
