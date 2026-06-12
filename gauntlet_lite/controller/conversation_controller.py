@@ -4,10 +4,11 @@ Routes messages, manages turn-taking, and coordinates bot interactions.
 """
 
 import logging
-from typing import List, Optional, Dict
-from gauntlet_lite.models.message import Message
-from gauntlet_lite.models.conversation_state import ConversationContext
+from typing import Dict, List, Optional
+
 from gauntlet_lite.agents.bot_agent import BotAgent
+from gauntlet_lite.models.conversation_state import ConversationContext
+from gauntlet_lite.models.message import Message
 
 logger = logging.getLogger(__name__)
 
@@ -122,7 +123,7 @@ class ConversationController:
 
         if verbose:
             print(f"\n{'='*60}")
-            print(f"Starting Conversation")
+            print("Starting Conversation")
             print(f"{'='*60}")
             print(f"{initial_msg}\n")
 
