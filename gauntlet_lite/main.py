@@ -8,6 +8,7 @@ Demonstrates a working multi-bot conversation with:
 - Clear identity and role management
 """
 
+from gauntlet_lite import BotAgent, ConversationController
 import logging
 import sys
 from pathlib import Path
@@ -22,7 +23,6 @@ logging.basicConfig(
     handlers=[logging.StreamHandler(sys.stdout)]
 )
 
-from gauntlet_lite import BotAgent, ConversationController
 
 
 def create_demo_bots(use_llm=False):
