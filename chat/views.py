@@ -15,7 +15,7 @@ from chat.triggers import mention
 @login_required
 def index(request):
     context = {
-        "conversations": Conversation.objects.all(),
+        "conversations": Conversation.objects.filter(participants__user=request.user),
         "version": settings.VERSION,
     }
 
@@ -50,7 +50,7 @@ def chat_new(request):
 @login_required
 def chat(request, conversation_uuid=False):
     # Fetch the conversation instance based on the UUID provided as a query parameter
-    conversation = get_object_or_404(Conversation, uuid=conversation_uuid)
+    conversation = get_object_or_404(Conversation, uuid=conversation_uuid, participants__user=request.user)
 
     # Retrieve all participants (both users and bots) from the conversation
     participants = conversation.participants.select_related("user", "bot").all()
@@ -60,7 +60,7 @@ def chat(request, conversation_uuid=False):
 
     # Create the context to pass to the template
     context = {
-        "conversations": Conversation.objects.all(),
+        "conversations": Conversation.objects.filter(participants__user=request.user),
         "conversation": conversation,
         "messages": messages,
         "participants": participants,
@@ -73,7 +73,7 @@ def chat(request, conversation_uuid=False):
 @login_required
 def user(request):
     context = {
-        "conversations": Conversation.objects.all(),
+        "conversations": Conversation.objects.filter(participants__user=request.user),
         "version": settings.VERSION,
     }
 
@@ -82,14 +82,14 @@ def user(request):
 
 @login_required
 def load_messages(request, conversation_uuid):
-    conversation = get_object_or_404(Conversation, uuid=conversation_uuid)
+    conversation = get_object_or_404(Conversation, uuid=conversation_uuid, participants__user=request.user)
     messages = Message.objects.filter(conversation=conversation).select_related("participant__user", "participant__bot").order_by("timestamp")
     return render(request, "chat/partials/messages.html", {"messages": messages})
 
 
 @login_required
 def conversation_title(request, conversation_uuid):
-    conversation = get_object_or_404(Conversation, uuid=conversation_uuid)
+    conversation = get_object_or_404(Conversation, uuid=conversation_uuid, participants__user=request.user)
 
     return HttpResponse(llm_conversation_title(conversation))
 
@@ -97,7 +97,7 @@ def conversation_title(request, conversation_uuid):
 @login_required
 @require_http_methods(["POST"])
 def send_message(request, conversation_uuid):
-    conversation = get_object_or_404(Conversation, uuid=conversation_uuid)
+    conversation = get_object_or_404(Conversation, uuid=conversation_uuid, participants__user=request.user)
     participant = conversation.participants.filter(user=request.user).first()  # Assuming the logged-in user is the sender
 
     if participant and "message" in request.POST:
@@ -115,7 +115,7 @@ def send_message(request, conversation_uuid):
 @login_required
 @require_http_methods(["GET", "POST"])
 def manage_bots_in_conversation(request, conversation_uuid):
-    conversation = get_object_or_404(Conversation, uuid=conversation_uuid)
+    conversation = get_object_or_404(Conversation, uuid=conversation_uuid, participants__user=request.user)
 
     if request.method == "POST":
         form = ManageBotsForm(request.POST)
@@ -138,7 +138,7 @@ def manage_bots_in_conversation(request, conversation_uuid):
 
     # Create the context to pass to the template
     context = {
-        "conversations": Conversation.objects.all(),
+        "conversations": Conversation.objects.filter(participants__user=request.user),
         "form": form,
         "conversation": conversation,
         "version": settings.VERSION,
@@ -150,7 +150,7 @@ def manage_bots_in_conversation(request, conversation_uuid):
 @login_required
 @require_http_methods(["GET", "POST"])
 def manage_triggers_for_conversation(request, conversation_uuid):
-    conversation = get_object_or_404(Conversation, uuid=conversation_uuid)
+    conversation = get_object_or_404(Conversation, uuid=conversation_uuid, participants__user=request.user)
 
     if request.method == "POST":
         form = ManageTriggersForm(request.POST)
@@ -172,7 +172,7 @@ def manage_triggers_for_conversation(request, conversation_uuid):
 
     # Create the context to pass to the template
     context = {
-        "conversations": Conversation.objects.all(),
+        "conversations": Conversation.objects.filter(participants__user=request.user),
         "form": form,
         "conversation": conversation,
         "version": settings.VERSION,
@@ -183,7 +183,7 @@ def manage_triggers_for_conversation(request, conversation_uuid):
 
 @login_required
 def chat_clear(request):
-    conversations = Conversation.objects.all()
+    conversations = Conversation.objects.filter(participants__user=request.user)
 
     # Bulk delete schedules
     schedule_names = [f"generate_messages_{uuid}" for uuid in conversations.values_list('uuid', flat=True)]
@@ -201,7 +201,7 @@ def chat_clear(request):
 
 @login_required
 def chat_delete(request, conversation_uuid):
-    conversation = get_object_or_404(Conversation, uuid=conversation_uuid)
+    conversation = get_object_or_404(Conversation, uuid=conversation_uuid, participants__user=request.user)
     Schedule.objects.filter(name=f"generate_messages_{conversation.uuid}").delete()
 
     if settings.BUILD_CORE_MEMORIES:
