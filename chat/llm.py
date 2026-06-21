@@ -52,7 +52,7 @@ def prompt_llm_messages(
 
 def llm_conversation_title(conversation):
     try:
-        conversation_text = "\n".join([msg.message for msg in conversation.messages.all()])
+        conversation_text = "\n".join([msg.message for msg in conversation.messages.all().select_related('participant__user', 'participant__bot')])
 
         messages = [
             {
@@ -88,7 +88,7 @@ def llm_form_core_memories(conversation, bot):
         logger.info(f"Conversation {conversation.uuid} has less than 5 messages, skipping core memory generation")
         return False
 
-    conversation_text = "\n".join([f"{msg.participant.name()}: {msg.message}" for msg in conversation.messages.all()])
+    conversation_text = "\n".join([f"{msg.participant.name()}: {msg.message}" for msg in conversation.messages.all().select_related('participant__user', 'participant__bot')])
 
     messages = [
         {
