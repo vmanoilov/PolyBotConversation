@@ -110,7 +110,7 @@ def generate_message_general(conversation, bot):
     messages = [{"role": "system", "name": "system", "content": system_prompt}]
 
     # Retrieve all messages for the conversation ordered by timestamp
-    conversation_messages = Message.objects.filter(conversation=conversation).order_by("timestamp")
+    conversation_messages = Message.objects.filter(conversation=conversation).order_by("timestamp").select_related('participant__user', 'participant__bot')
 
     # Convert each message into the format required by OpenAI
     for msg in conversation_messages:
