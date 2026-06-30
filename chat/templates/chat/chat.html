@@ -20,7 +20,10 @@
         </div>
         <a href="{% url 'chat:manage_bots_in_conversation' conversation.uuid %}" class="btn btn-secondary mt-3">Modify Bots</a>
         <a href="{% url 'chat:manage_triggers_for_conversation' conversation.uuid %}" class="btn btn-secondary mt-3">Modify Triggers</a>
-        <a href="{% url 'chat:chat_delete' conversation.uuid %}" class="btn btn-warning mt-3">Delete</a>
+        <form method="post" action="{% url 'chat:chat_delete' conversation.uuid %}" class="d-inline">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-warning mt-3">Delete</button>
+        </form>
     </div>
 </div>
 

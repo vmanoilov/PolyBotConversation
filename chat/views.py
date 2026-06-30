@@ -182,6 +182,7 @@ def manage_triggers_for_conversation(request, conversation_uuid):
 
 
 @login_required
+@require_http_methods(["POST"])
 def chat_clear(request):
     conversations = Conversation.objects.filter(participants__user=request.user)
 
@@ -197,6 +198,7 @@ def chat_clear(request):
 
 
 @login_required
+@require_http_methods(["POST"])
 def chat_delete(request, conversation_uuid):
     conversation = get_object_or_404(Conversation, uuid=conversation_uuid, participants__user=request.user)
     Schedule.objects.filter(name=f"generate_messages_{conversation.uuid}").delete()
