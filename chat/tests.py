@@ -140,3 +140,21 @@ class HelpersTest(TestCase):
 
         # Verify result
         self.assertEqual(result, expected_prompt)
+
+
+class ConversationTitleViewTest(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username="testuser", password="testpassword")
+        self.conversation = Conversation.objects.create(title="Test Conversation")
+        self.participant_user = Participant.objects.create(participant_type="user", user=self.user)
+        self.conversation.participants.add(self.participant_user)
+
+    @patch("chat.views.llm_conversation_title")
+    def test_conversation_title_escapes_html(self, mock_llm_conversation_title):
+        mock_llm_conversation_title.return_value = "<script>alert('xss')</script>"
+
+        self.client.login(username="testuser", password="testpassword")
+        response = self.client.get(f"/chat/{self.conversation.uuid}/title")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content.decode("utf-8"), "&lt;script&gt;alert(&#x27;xss&#x27;)&lt;/script&gt;")
