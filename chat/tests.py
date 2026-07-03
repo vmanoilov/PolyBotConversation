@@ -4,7 +4,8 @@ from django.contrib.auth.models import User
 from django.test import TestCase
 
 from chat.helpers import get_system_prompt
-from chat.models import Bot, Conversation, CoreMemory, LLMRequest, Message, Participant, Trigger
+from chat.models import (Bot, Conversation, CoreMemory, LLMRequest, Message,
+                         Participant, Trigger)
 from chat.prompt_templates import prompts
 
 
