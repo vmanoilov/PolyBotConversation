@@ -34,15 +34,7 @@ class BotAgent:
         use_llm: Whether to use real LLM or mock responses
     """
 
-    def __init__(
-        self,
-        id: str,
-        name: str,
-        prompt: str,
-        model: str = "gpt-3.5-turbo",
-        temperature: float = 0.7,
-        use_llm: bool = False
-    ):
+    def __init__(self, id: str, name: str, prompt: str, model: str = "gpt-3.5-turbo", temperature: float = 0.7, use_llm: bool = False):
         self.id = id
         self.name = name
         self.prompt = prompt
@@ -55,6 +47,7 @@ class BotAgent:
         if self.use_llm:
             try:
                 import openai
+
                 self.openai = openai
                 self.api_key = os.environ.get("OPENAI_API_KEY")
                 if not self.api_key:
@@ -84,11 +77,7 @@ class BotAgent:
             response_content = self._generate_mock_response(input_message, context)
 
         # Create and return response message
-        response = Message(
-            from_=self.name,
-            content=response_content,
-            meta={"bot_id": self.id}
-        )
+        response = Message(from_=self.name, content=response_content, meta={"bot_id": self.id})
 
         self.memory.append(response)
         return response
@@ -99,22 +88,13 @@ class BotAgent:
             client = self.openai.OpenAI(api_key=self.api_key)
 
             # Build messages for LLM
-            messages = [
-                {
-                    "role": "system",
-                    "content": self._build_system_prompt(context)
-                }
-            ]
+            messages = [{"role": "system", "content": self._build_system_prompt(context)}]
 
             # Add conversation history
             messages.extend(context.get_history_for_llm(bot_name=self.name))
 
             # Call LLM
-            response = client.chat.completions.create(
-                model=self.model,
-                temperature=self.temperature,
-                messages=messages
-            )
+            response = client.chat.completions.create(model=self.model, temperature=self.temperature, messages=messages)
 
             return response.choices[0].message.content
 

@@ -56,11 +56,7 @@ class ConversationContext:
         for msg in self.messages:
             # Messages from this bot are "assistant", others are "user"
             role = "assistant" if msg.from_ == bot_name else "user"
-            llm_messages.append({
-                "role": role,
-                "name": msg.from_,
-                "content": msg.content
-            })
+            llm_messages.append({"role": role, "name": msg.from_, "content": msg.content})
         return llm_messages
 
     def clear(self):
