@@ -19,4 +19,3 @@ class Command(BaseCommand):
         logger.info(conversation.uuid)
 
         general(conversation=conversation)
-        # generate_core_memories(conversation=conversation)
