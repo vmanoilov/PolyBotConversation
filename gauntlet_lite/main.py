@@ -12,6 +12,7 @@ import logging
 import sys
 from pathlib import Path
 
+from gauntlet_lite import BotAgent, ConversationController
 # Add parent directory to path to import gauntlet_lite
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
@@ -22,7 +23,6 @@ logging.basicConfig(
     handlers=[logging.StreamHandler(sys.stdout)],
 )
 
-from gauntlet_lite import BotAgent, ConversationController
 
 
 def create_demo_bots(use_llm=False):
