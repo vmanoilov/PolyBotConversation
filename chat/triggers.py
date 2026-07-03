@@ -1,12 +1,11 @@
 import logging
 from datetime import timedelta
 
+from chat.bot import generate_message_general, generate_message_mention
+from chat.helpers import detect_mention
 from django.utils import timezone
 from django_q.models import Schedule
 from django_q.tasks import schedule
-
-from chat.bot import generate_message_mention
-from chat.helpers import detect_mention
 
 logger = logging.getLogger(__name__)
 
