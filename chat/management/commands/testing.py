@@ -20,4 +20,3 @@ class Command(BaseCommand):
 
         conversation.participants.filter(participant_type="bot").first().bot
         general(conversation=conversation)
-        # generate_core_memories(conversation=conversation)
