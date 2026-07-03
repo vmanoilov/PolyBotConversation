@@ -12,10 +12,10 @@ import logging
 import sys
 from pathlib import Path
 
-from gauntlet_lite import BotAgent, ConversationController
 # Add parent directory to path to import gauntlet_lite
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
+from gauntlet_lite import BotAgent, ConversationController
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
