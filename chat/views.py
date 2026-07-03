@@ -125,8 +125,7 @@ def manage_bots_in_conversation(request, conversation_uuid):
 
             removed_bots = current_bots.exclude(bot__in=selected_bots)
 
-            for removed_bot in removed_bots:
-                conversation.participants.remove(removed_bot)
+            conversation.participants.remove(*removed_bots)
 
             for bot in selected_bots:
                 participant, created = Participant.objects.get_or_create(participant_type="bot", bot=bot)
@@ -160,11 +159,9 @@ def manage_triggers_for_conversation(request, conversation_uuid):
 
             removed_triggers = current_triggers.exclude(id__in=selected_triggers)
 
-            for removed_trigger in removed_triggers:
-                conversation.triggers.remove(removed_trigger)
+            conversation.triggers.remove(*removed_triggers)
 
-            for trigger in selected_triggers:
-                conversation.triggers.add(trigger)
+            conversation.triggers.add(*selected_triggers)
 
             return redirect("chat:chat", conversation_uuid=conversation_uuid)
     else:
