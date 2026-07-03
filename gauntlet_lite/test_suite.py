@@ -100,21 +100,21 @@ def test_bot_should_respond():
 
     # Should respond to messages from others
     msg1 = Message(from_="user", content="Hello")
-    assert bot.should_respond(msg1, context) == True
+    assert bot.should_respond(msg1, context)
 
     # Should not respond to own messages (by name)
     msg2 = Message(from_="Bot1", content="Test")
-    assert bot.should_respond(msg2, context) == False
+    assert not bot.should_respond(msg2, context)
 
     # Should not respond to own messages (by ID)
     msg3 = Message(from_="bot1", content="Test")
-    assert bot.should_respond(msg3, context) == False
+    assert not bot.should_respond(msg3, context)
 
     # Should not respond if just responded
     context.add_message(Message(from_="user", content="Hi"))
     context.add_message(Message(from_="Bot1", content="Response"))
     msg4 = Message(from_="user", content="Another message")
-    assert bot.should_respond(msg4, context) == False
+    assert not bot.should_respond(msg4, context)
 
     print("✓")
 

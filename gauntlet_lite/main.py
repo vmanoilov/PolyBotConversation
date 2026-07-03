@@ -15,14 +15,14 @@ from pathlib import Path
 # Add parent directory to path to import gauntlet_lite
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
+from gauntlet_lite import BotAgent, ConversationController
+
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     handlers=[logging.StreamHandler(sys.stdout)]
 )
-
-from gauntlet_lite import BotAgent, ConversationController
 
 
 def create_demo_bots(use_llm=False):
