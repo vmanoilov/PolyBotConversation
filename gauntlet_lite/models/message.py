@@ -28,7 +28,7 @@ class Message:
         to: Optional[str] = None,
         id: Optional[str] = None,
         timestamp: Optional[float] = None,
-        meta: Optional[dict] = None
+        meta: Optional[dict] = None,
     ):
         self.id = id or str(uuid.uuid4())
         self.from_ = from_
@@ -39,7 +39,9 @@ class Message:
 
     def __repr__(self):
         target = f" -> {self.to}" if self.to else ""
-        content_preview = self.content[:50] + "..." if len(self.content) > 50 else self.content
+        content_preview = (
+            self.content[:50] + "..." if len(self.content) > 50 else self.content
+        )
         return f"Message(from={self.from_}{target}, content='{content_preview}')"
 
     def __str__(self):
@@ -53,5 +55,5 @@ class Message:
             "to": self.to,
             "content": self.content,
             "timestamp": self.timestamp,
-            "meta": self.meta
+            "meta": self.meta,
         }

@@ -36,6 +36,8 @@ urlpatterns = [
         views.manage_triggers_for_conversation,
         name="manage_triggers_for_conversation",
     ),
-    path("chat/<uuid:conversation_uuid>/delete/", views.chat_delete, name="chat_delete"),
+    path(
+        "chat/<uuid:conversation_uuid>/delete/", views.chat_delete, name="chat_delete"
+    ),
     path("accounts/", include("django.contrib.auth.urls")),
 ]

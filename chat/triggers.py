@@ -1,7 +1,7 @@
 import logging
 from datetime import timedelta
 
-from chat.bot import generate_message_general, generate_message_mention
+from chat.bot import generate_message_mention
 from chat.helpers import detect_mention
 from django.utils import timezone
 from django_q.models import Schedule
@@ -11,10 +11,15 @@ logger = logging.getLogger(__name__)
 
 
 def mention(conversation):
-    bots = [participant.bot for participant in conversation.participants.filter(participant_type="bot")]
+    bots = [
+        participant.bot
+        for participant in conversation.participants.filter(participant_type="bot")
+    ]
 
     for bot in bots:
-        messages = conversation.messages.exclude(triggered_bots__id=bot.id).exclude(participant__bot__id=bot.id)
+        messages = conversation.messages.exclude(triggered_bots__id=bot.id).exclude(
+            participant__bot__id=bot.id
+        )
 
         for message in messages:
             if detect_mention(bot.name, message.message):
@@ -24,7 +29,16 @@ def mention(conversation):
 
 
 def general(conversation):
-    bots = [participant.bot for participant in conversation.participants.filter(participant_type="bot")]
+    bots = [
+        participant.bot
+        for participant in conversation.participants.filter(participant_type="bot")
+    ]
 
     for i, bot in enumerate(bots):
-        schedule("chat.bot.generate_message_general", conversation, bot, schedule_type=Schedule.ONCE, next_run=timezone.now() + timedelta(seconds=i * 5))
+        schedule(
+            "chat.bot.generate_message_general",
+            conversation,
+            bot,
+            schedule_type=Schedule.ONCE,
+            next_run=timezone.now() + timedelta(seconds=i * 5),
+        )

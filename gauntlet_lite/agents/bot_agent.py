@@ -41,7 +41,7 @@ class BotAgent:
         prompt: str,
         model: str = "gpt-3.5-turbo",
         temperature: float = 0.7,
-        use_llm: bool = False
+        use_llm: bool = False,
     ):
         self.id = id
         self.name = name
@@ -55,13 +55,18 @@ class BotAgent:
         if self.use_llm:
             try:
                 import openai
+
                 self.openai = openai
                 self.api_key = os.environ.get("OPENAI_API_KEY")
                 if not self.api_key:
-                    logger.warning(f"Bot {self.name}: OPENAI_API_KEY not set, falling back to mock responses")
+                    logger.warning(
+                        f"Bot {self.name}: OPENAI_API_KEY not set, falling back to mock responses"
+                    )
                     self.use_llm = False
             except ImportError:
-                logger.warning(f"Bot {self.name}: openai package not installed, using mock responses")
+                logger.warning(
+                    f"Bot {self.name}: openai package not installed, using mock responses"
+                )
                 self.use_llm = False
 
     def respond(self, input_message: Message, context: ConversationContext) -> Message:
@@ -85,9 +90,7 @@ class BotAgent:
 
         # Create and return response message
         response = Message(
-            from_=self.name,
-            content=response_content,
-            meta={"bot_id": self.id}
+            from_=self.name, content=response_content, meta={"bot_id": self.id}
         )
 
         self.memory.append(response)
@@ -100,10 +103,7 @@ class BotAgent:
 
             # Build messages for LLM
             messages = [
-                {
-                    "role": "system",
-                    "content": self._build_system_prompt(context)
-                }
+                {"role": "system", "content": self._build_system_prompt(context)}
             ]
 
             # Add conversation history
@@ -111,9 +111,7 @@ class BotAgent:
 
             # Call LLM
             response = client.chat.completions.create(
-                model=self.model,
-                temperature=self.temperature,
-                messages=messages
+                model=self.model, temperature=self.temperature, messages=messages
             )
 
             return response.choices[0].message.content
@@ -122,7 +120,9 @@ class BotAgent:
             logger.error(f"Bot {self.name}: LLM error: {e}, falling back to mock")
             return self._generate_mock_response(context.get_last_message(), context)
 
-    def _generate_mock_response(self, input_message: Message, context: ConversationContext) -> str:
+    def _generate_mock_response(
+        self, input_message: Message, context: ConversationContext
+    ) -> str:
         """Generate a mock response without calling LLM."""
         # Simple mock responses based on conversation state
         message_count = len(context.messages)
@@ -177,7 +177,10 @@ Important guidelines:
             return False
 
         # Don't respond if we just responded
-        if context.messages and (context.messages[-1].from_ == self.name or context.messages[-1].from_ == self.id):
+        if context.messages and (
+            context.messages[-1].from_ == self.name
+            or context.messages[-1].from_ == self.id
+        ):
             return False
 
         return True

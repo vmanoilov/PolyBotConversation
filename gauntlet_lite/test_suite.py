@@ -71,7 +71,7 @@ def test_bot_agent():
         name="TestBot",
         prompt="You are a test bot.",
         temperature=0.7,
-        use_llm=False
+        use_llm=False,
     )
 
     assert bot.id == "test-bot"
@@ -100,21 +100,21 @@ def test_bot_should_respond():
 
     # Should respond to messages from others
     msg1 = Message(from_="user", content="Hello")
-    assert bot.should_respond(msg1, context) == True
+    assert bot.should_respond(msg1, context)
 
     # Should not respond to own messages (by name)
     msg2 = Message(from_="Bot1", content="Test")
-    assert bot.should_respond(msg2, context) == False
+    assert not bot.should_respond(msg2, context)
 
     # Should not respond to own messages (by ID)
     msg3 = Message(from_="bot1", content="Test")
-    assert bot.should_respond(msg3, context) == False
+    assert not bot.should_respond(msg3, context)
 
     # Should not respond if just responded
     context.add_message(Message(from_="user", content="Hi"))
     context.add_message(Message(from_="Bot1", content="Response"))
     msg4 = Message(from_="user", content="Another message")
-    assert bot.should_respond(msg4, context) == False
+    assert not bot.should_respond(msg4, context)
 
     print("✓")
 
@@ -161,9 +161,7 @@ def test_conversation_flow():
 
     # Run conversation
     controller.run_conversation(
-        initial_message="Let's discuss testing.",
-        max_turns=4,
-        verbose=False
+        initial_message="Let's discuss testing.", max_turns=4, verbose=False
     )
 
     # Should have initial message + 4 bot responses
@@ -260,9 +258,9 @@ def test_targeted_messaging():
 
 def run_all_tests():
     """Run all test functions."""
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("GauntletFuse Phase 0 - Test Suite")
-    print("="*70 + "\n")
+    print("=" * 70 + "\n")
 
     test_functions = [
         test_message_creation,
@@ -285,15 +283,15 @@ def run_all_tests():
             print(f"✗ FAILED: {e}")
             failed += 1
 
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     if failed == 0:
         print("ALL TESTS PASSED ✅")
-        print("="*70)
+        print("=" * 70)
         print("\nGauntletFuse Phase 0 is working correctly!")
         return 0
     else:
         print(f"{failed} TEST(S) FAILED ❌")
-        print("="*70)
+        print("=" * 70)
         return 1
 
 

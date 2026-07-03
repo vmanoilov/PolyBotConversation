@@ -52,13 +52,17 @@ def prompt_llm_messages(
 
 def llm_conversation_title(conversation):
     try:
-        conversation_text = "\n".join([msg.message for msg in conversation.messages.all()])
+        conversation_text = "\n".join(
+            [msg.message for msg in conversation.messages.all()]
+        )
 
         messages = [
             {
                 "role": "system",
                 "name": "system",
-                "content": prompts["conversation_summary"].format(conversation_text=conversation_text),
+                "content": prompts["conversation_summary"].format(
+                    conversation_text=conversation_text
+                ),
             }
         ]
 
@@ -67,7 +71,9 @@ def llm_conversation_title(conversation):
         # Santized bot response with only ASCII characters
         bot_response_sanitized = bot_response
         bot_response_sanitized = bot_response_sanitized.replace('"', "")
-        bot_response_sanitized = "".join([i if ord(i) < 128 else " " for i in bot_response_sanitized])
+        bot_response_sanitized = "".join(
+            [i if ord(i) < 128 else " " for i in bot_response_sanitized]
+        )
 
         conversation.title = bot_response_sanitized
         conversation.title_update_date = timezone.now()
@@ -85,24 +91,37 @@ def llm_form_core_memories(conversation, bot):
 
     # Only generate core memories if there are at least 5 messages in the conversation
     if len(conversation.messages.all()) < 5:
-        logger.info(f"Conversation {conversation.uuid} has less than 5 messages, skipping core memory generation")
+        logger.info(
+            f"Conversation {conversation.uuid} has less than 5 messages, skipping core memory generation"
+        )
         return False
 
-    conversation_text = "\n".join([f"{msg.participant.name()}: {msg.message}" for msg in conversation.messages.all()])
+    conversation_text = "\n".join(
+        [
+            f"{msg.participant.name()}: {msg.message}"
+            for msg in conversation.messages.all()
+        ]
+    )
 
     messages = [
         {
             "role": "system",
             "name": "system",
-            "content": prompts["core_memories"].format(conversation_text=conversation_text, bot_name=bot.name),
+            "content": prompts["core_memories"].format(
+                conversation_text=conversation_text, bot_name=bot.name
+            ),
         }
     ]
 
-    bot_response = prompt_llm_messages(messages, response_format={"type": "json_object"})
+    bot_response = prompt_llm_messages(
+        messages, response_format={"type": "json_object"}
+    )
 
     try:
         core_memories = json.loads(bot_response)
-        logger.info(f"{len(core_memories['core_memories'])} core memories generated for {bot.name}")
+        logger.info(
+            f"{len(core_memories['core_memories'])} core memories generated for {bot.name}"
+        )
         for core_memory in core_memories["core_memories"]:
             bot.core_memories.create(memory=core_memory)
 

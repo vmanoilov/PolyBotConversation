@@ -19,7 +19,9 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument("trigger", type=str, help="Trigger for the chat message")
         parser.add_argument("conversation_id", type=int, help="ID of the conversation")
-        parser.add_argument("message_id", type=int, help="ID of the message", default=None)
+        parser.add_argument(
+            "message_id", type=int, help="ID of the message", default=None
+        )
         parser.add_argument("bot_id", type=int, help="ID of the bot")
 
     def handle(self, *args, **kwargs):
