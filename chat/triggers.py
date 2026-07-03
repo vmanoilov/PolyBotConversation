@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 
 def mention(conversation):
-    bots = [participant.bot for participant in conversation.participants.filter(participant_type="bot")]
+    bots = [participant.bot for participant in conversation.participants.filter(participant_type="bot").select_related("bot")]
 
     for bot in bots:
         messages = conversation.messages.exclude(triggered_bots__id=bot.id).exclude(participant__bot__id=bot.id)
@@ -24,7 +24,7 @@ def mention(conversation):
 
 
 def general(conversation):
-    bots = [participant.bot for participant in conversation.participants.filter(participant_type="bot")]
+    bots = [participant.bot for participant in conversation.participants.filter(participant_type="bot").select_related("bot")]
 
     for i, bot in enumerate(bots):
         schedule("chat.bot.generate_message_general", conversation, bot, schedule_type=Schedule.ONCE, next_run=timezone.now() + timedelta(seconds=i * 5))
