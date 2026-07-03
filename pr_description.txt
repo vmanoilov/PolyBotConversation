@@ -1,9 +1,0 @@
-💡 **What:** Replaced individual `.remove()` and `.add()` operations on M2M relationships within a loop with unpacked bulk `.remove(*list)` and `.add(*list)` operations.
-
-🎯 **Why:** To significantly reduce the number of database queries executed during bot and trigger management in conversations. Removing or adding multiple items in a loop issues a distinct query for every single item, while passing them all at once to `.remove(*items)` issues just a handful of queries (or one large one).
-
-📊 **Measured Improvement:**
-* **Bot Removal Baseline:** ~0.1592s, 150 queries (for removing 50 items)
-* **Bot Removal Optimized:** ~0.0039s, 3 queries (97.5% faster, 98% fewer queries)
-* **Trigger Addition Baseline:** ~0.5090s, 301 queries (for adding 100 items)
-* **Trigger Addition Optimized:** ~0.0076s, 3 queries (98.5% faster, 99% fewer queries)
