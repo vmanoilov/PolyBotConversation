@@ -3,7 +3,7 @@ from unittest.mock import Mock, patch
 from django.contrib.auth.models import User
 from django.test import TestCase
 
-from chat.helpers import get_system_prompt
+from chat.helpers import get_system_prompt, detect_mention
 from chat.models import Bot, Conversation, CoreMemory, LLMRequest, Message, Participant, Trigger
 from chat.prompt_templates import prompts
 
@@ -140,3 +140,20 @@ class HelpersTest(TestCase):
 
         # Verify result
         self.assertEqual(result, expected_prompt)
+
+
+class TestDetectMention(TestCase):
+    def test_exact_match(self):
+        self.assertTrue(detect_mention("BotName", "@BotName hello"))
+
+    def test_case_insensitive_match(self):
+        self.assertTrue(detect_mention("BotName", "@botname hello"))
+
+    def test_no_mention(self):
+        self.assertIsNone(detect_mention("BotName", "hello there"))
+
+    def test_mention_in_middle(self):
+        self.assertTrue(detect_mention("BotName", "hello @BotName how are you?"))
+
+    def test_mention_with_punctuation(self):
+        self.assertTrue(detect_mention("BotName", "hello @BotName, how are you?"))
