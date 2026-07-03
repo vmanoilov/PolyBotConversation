@@ -19,6 +19,5 @@ class Command(BaseCommand):
         conversation = Conversation.objects.last()
         logger.info(conversation.uuid)
 
-        bot = conversation.participants.filter(participant_type="bot").first().bot
         general(conversation=conversation)
         # generate_core_memories(conversation=conversation)
