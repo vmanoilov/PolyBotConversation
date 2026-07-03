@@ -50,13 +50,19 @@ def chat_new(request):
 @login_required
 def chat(request, conversation_uuid=False):
     # Fetch the conversation instance based on the UUID provided as a query parameter
-    conversation = get_object_or_404(Conversation, uuid=conversation_uuid, participants__user=request.user)
+    conversation = get_object_or_404(
+        Conversation, uuid=conversation_uuid, participants__user=request.user
+    )
 
     # Retrieve all participants (both users and bots) from the conversation
     participants = conversation.participants.select_related("user", "bot").all()
 
     # Retrieve all messages for the conversation
-    messages = Message.objects.filter(conversation=conversation).select_related("participant__user", "participant__bot").order_by("timestamp")
+    messages = (
+        Message.objects.filter(conversation=conversation)
+        .select_related("participant__user", "participant__bot")
+        .order_by("timestamp")
+    )
 
     # Create the context to pass to the template
     context = {
@@ -82,14 +88,22 @@ def user(request):
 
 @login_required
 def load_messages(request, conversation_uuid):
-    conversation = get_object_or_404(Conversation, uuid=conversation_uuid, participants__user=request.user)
-    messages = Message.objects.filter(conversation=conversation).select_related("participant__user", "participant__bot").order_by("timestamp")
+    conversation = get_object_or_404(
+        Conversation, uuid=conversation_uuid, participants__user=request.user
+    )
+    messages = (
+        Message.objects.filter(conversation=conversation)
+        .select_related("participant__user", "participant__bot")
+        .order_by("timestamp")
+    )
     return render(request, "chat/partials/messages.html", {"messages": messages})
 
 
 @login_required
 def conversation_title(request, conversation_uuid):
-    conversation = get_object_or_404(Conversation, uuid=conversation_uuid, participants__user=request.user)
+    conversation = get_object_or_404(
+        Conversation, uuid=conversation_uuid, participants__user=request.user
+    )
 
     return HttpResponse(llm_conversation_title(conversation))
 
@@ -97,25 +111,37 @@ def conversation_title(request, conversation_uuid):
 @login_required
 @require_http_methods(["POST"])
 def send_message(request, conversation_uuid):
-    conversation = get_object_or_404(Conversation, uuid=conversation_uuid, participants__user=request.user)
-    participant = conversation.participants.filter(user=request.user).first()  # Assuming the logged-in user is the sender
+    conversation = get_object_or_404(
+        Conversation, uuid=conversation_uuid, participants__user=request.user
+    )
+    participant = conversation.participants.filter(
+        user=request.user
+    ).first()  # Assuming the logged-in user is the sender
 
     if participant and "message" in request.POST:
         message_content = request.POST["message"]
-        Message.objects.create(conversation=conversation, participant=participant, message=message_content)
+        Message.objects.create(
+            conversation=conversation, participant=participant, message=message_content
+        )
 
         if conversation.triggers.filter(name="mention").exists():
             mention(conversation)
 
     # Return updated messages list
-    messages = Message.objects.filter(conversation=conversation).select_related("participant__user", "participant__bot").order_by("timestamp")
+    messages = (
+        Message.objects.filter(conversation=conversation)
+        .select_related("participant__user", "participant__bot")
+        .order_by("timestamp")
+    )
     return render(request, "chat/partials/messages.html", {"messages": messages})
 
 
 @login_required
 @require_http_methods(["GET", "POST"])
 def manage_bots_in_conversation(request, conversation_uuid):
-    conversation = get_object_or_404(Conversation, uuid=conversation_uuid, participants__user=request.user)
+    conversation = get_object_or_404(
+        Conversation, uuid=conversation_uuid, participants__user=request.user
+    )
 
     if request.method == "POST":
         form = ManageBotsForm(request.POST)
@@ -129,12 +155,20 @@ def manage_bots_in_conversation(request, conversation_uuid):
                 conversation.participants.remove(removed_bot)
 
             for bot in selected_bots:
-                participant, created = Participant.objects.get_or_create(participant_type="bot", bot=bot)
+                participant, created = Participant.objects.get_or_create(
+                    participant_type="bot", bot=bot
+                )
                 conversation.participants.add(participant)
 
             return redirect("chat:chat", conversation_uuid=conversation_uuid)
     else:
-        form = ManageBotsForm(initial={"bots": conversation.participants.filter(participant_type="bot").values_list("bot", flat=True)})
+        form = ManageBotsForm(
+            initial={
+                "bots": conversation.participants.filter(
+                    participant_type="bot"
+                ).values_list("bot", flat=True)
+            }
+        )
 
     # Create the context to pass to the template
     context = {
@@ -150,7 +184,9 @@ def manage_bots_in_conversation(request, conversation_uuid):
 @login_required
 @require_http_methods(["GET", "POST"])
 def manage_triggers_for_conversation(request, conversation_uuid):
-    conversation = get_object_or_404(Conversation, uuid=conversation_uuid, participants__user=request.user)
+    conversation = get_object_or_404(
+        Conversation, uuid=conversation_uuid, participants__user=request.user
+    )
 
     if request.method == "POST":
         form = ManageTriggersForm(request.POST)
@@ -168,7 +204,9 @@ def manage_triggers_for_conversation(request, conversation_uuid):
 
             return redirect("chat:chat", conversation_uuid=conversation_uuid)
     else:
-        form = ManageTriggersForm(initial={"triggers": conversation.triggers.all().values_list(flat=True)})
+        form = ManageTriggersForm(
+            initial={"triggers": conversation.triggers.all().values_list(flat=True)}
+        )
 
     # Create the context to pass to the template
     context = {
@@ -185,20 +223,28 @@ def manage_triggers_for_conversation(request, conversation_uuid):
 def chat_clear(request):
     conversations = Conversation.objects.filter(participants__user=request.user)
 
-    for conversation in conversations:
-        Schedule.objects.filter(name=f"generate_messages_{conversation.uuid}").delete()
+    # Gather UUIDs for bulk Schedule deletion
+    schedule_names = [
+        f"generate_messages_{conversation.uuid}" for conversation in conversations
+    ]
 
-        if settings.BUILD_CORE_MEMORIES:
+    if schedule_names:
+        Schedule.objects.filter(name__in=schedule_names).delete()
+
+    if settings.BUILD_CORE_MEMORIES:
+        for conversation in conversations:
             async_task("chat.tasks.generate_core_memories", conversation)
 
-        conversation.delete()
+    conversations.delete()
 
     return redirect("chat:index")
 
 
 @login_required
 def chat_delete(request, conversation_uuid):
-    conversation = get_object_or_404(Conversation, uuid=conversation_uuid, participants__user=request.user)
+    conversation = get_object_or_404(
+        Conversation, uuid=conversation_uuid, participants__user=request.user
+    )
     Schedule.objects.filter(name=f"generate_messages_{conversation.uuid}").delete()
 
     if settings.BUILD_CORE_MEMORIES:
