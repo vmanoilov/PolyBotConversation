@@ -3,7 +3,6 @@ import logging
 from django.core.management.base import BaseCommand
 
 from chat.models import Conversation
-from chat.tasks import generate_core_memories
 from chat.triggers import general
 
 logger = logging.getLogger(__name__)
@@ -20,4 +19,3 @@ class Command(BaseCommand):
         logger.info(conversation.uuid)
 
         general(conversation=conversation)
-        # generate_core_memories(conversation=conversation)
