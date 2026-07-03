@@ -2,6 +2,7 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils.html import escape
 from django.views.decorators.http import require_http_methods
 from django_q.models import Schedule
 from django_q.tasks import async_task, schedule
@@ -91,7 +92,7 @@ def load_messages(request, conversation_uuid):
 def conversation_title(request, conversation_uuid):
     conversation = get_object_or_404(Conversation, uuid=conversation_uuid, participants__user=request.user)
 
-    return HttpResponse(llm_conversation_title(conversation))
+    return HttpResponse(escape(llm_conversation_title(conversation)))
 
 
 @login_required
