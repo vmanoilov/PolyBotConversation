@@ -43,10 +43,10 @@ class Conversation(models.Model):
         return f"Conversation {self.uuid} created on {self.creation_date}"
 
     def list_of_bots(self):
-        return ", ".join([participant.name() for participant in self.participants.filter(participant_type="bot")])
+        return ", ".join([participant.name() for participant in self.participants.select_related("bot").filter(participant_type="bot")])
 
     def list_of_humans(self):
-        return ", ".join([participant.name() for participant in self.participants.filter(participant_type="user")])
+        return ", ".join([participant.name() for participant in self.participants.select_related("user").filter(participant_type="user")])
 
 
 class Participant(models.Model):
