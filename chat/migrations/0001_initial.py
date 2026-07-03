@@ -87,7 +87,9 @@ class Migration(migrations.Migration):
                 ("id", models.AutoField(primary_key=True, serialize=False)),
                 (
                     "participant_type",
-                    models.CharField(choices=[("user", "User"), ("bot", "Bot")], max_length=10),
+                    models.CharField(
+                        choices=[("user", "User"), ("bot", "Bot")], max_length=10
+                    ),
                 ),
                 (
                     "bot",
@@ -127,7 +129,9 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "triggered_bots",
-                    models.ManyToManyField(blank=True, related_name="responded_messages", to="chat.bot"),
+                    models.ManyToManyField(
+                        blank=True, related_name="responded_messages", to="chat.bot"
+                    ),
                 ),
                 (
                     "participant",
@@ -142,11 +146,15 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="conversation",
             name="participants",
-            field=models.ManyToManyField(related_name="conversations", to="chat.participant"),
+            field=models.ManyToManyField(
+                related_name="conversations", to="chat.participant"
+            ),
         ),
         migrations.AddField(
             model_name="conversation",
             name="triggers",
-            field=models.ManyToManyField(blank=True, related_name="conversations", to="chat.trigger"),
+            field=models.ManyToManyField(
+                blank=True, related_name="conversations", to="chat.trigger"
+            ),
         ),
     ]

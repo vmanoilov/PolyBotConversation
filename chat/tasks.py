@@ -7,13 +7,18 @@ from chat.triggers import general, mention
 
 
 def update_conversation_titles():
-    conversations = Conversation.objects.annotate(last_message_timestamp=Max("messages__timestamp"))
+    conversations = Conversation.objects.annotate(
+        last_message_timestamp=Max("messages__timestamp")
+    )
 
     for conversation in conversations:
         try:
             if conversation.last_message_timestamp is None:
                 continue
-            if conversation.last_message_timestamp > conversation.title_update_date or conversation.title is None:
+            if (
+                conversation.last_message_timestamp > conversation.title_update_date
+                or conversation.title is None
+            ):
                 llm_conversation_title(conversation)
         except AttributeError:
             pass
@@ -33,6 +38,9 @@ def generate_messages(conversation_id):
 
 
 def generate_core_memories(conversation):
-    bots = [participant.bot for participant in conversation.participants.filter(participant_type="bot")]
+    bots = [
+        participant.bot
+        for participant in conversation.participants.filter(participant_type="bot")
+    ]
     for bot in bots:
         llm_form_core_memories(conversation, bot)

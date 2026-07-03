@@ -82,7 +82,9 @@ class ConversationController:
 
             bot_id = self.turn_order[self.current_turn_index]
             bot = self.bots[bot_id]
-            self.current_turn_index = (self.current_turn_index + 1) % len(self.turn_order)
+            self.current_turn_index = (self.current_turn_index + 1) % len(
+                self.turn_order
+            )
 
         # Check if there's a message to respond to
         last_message = self.context.get_last_message()
@@ -104,7 +106,9 @@ class ConversationController:
 
         return response
 
-    def run_conversation(self, initial_message: str, max_turns: int = 10, verbose: bool = True):
+    def run_conversation(
+        self, initial_message: str, max_turns: int = 10, verbose: bool = True
+    ):
         """
         Run a complete conversation with all registered bots.
 
@@ -122,9 +126,9 @@ class ConversationController:
         self.add_message(initial_msg)
 
         if verbose:
-            print(f"\n{'='*60}")
+            print(f"\n{'=' * 60}")
             print("Starting Conversation")
-            print(f"{'='*60}")
+            print(f"{'=' * 60}")
             print(f"{initial_msg}\n")
 
         # Process turns
@@ -148,9 +152,9 @@ class ConversationController:
                 break
 
         if verbose:
-            print(f"{'='*60}")
+            print(f"{'=' * 60}")
             print(f"Conversation ended after {turn_count} turns")
-            print(f"{'='*60}\n")
+            print(f"{'=' * 60}\n")
 
     def broadcast_message(self, content: str, from_: str = "system") -> List[Message]:
         """
@@ -185,20 +189,20 @@ class ConversationController:
             Formatted string with conversation history
         """
         summary_lines = [
-            "="*60,
+            "=" * 60,
             "CONVERSATION SUMMARY",
-            "="*60,
+            "=" * 60,
             f"Total messages: {len(self.context.messages)}",
             f"Participants: {', '.join(sorted(self.context.participants))}",
             "",
             "Message History:",
-            "-"*60
+            "-" * 60,
         ]
 
         for msg in self.context.messages:
             summary_lines.append(f"[{msg.from_}]: {msg.content}")
 
-        summary_lines.append("="*60)
+        summary_lines.append("=" * 60)
 
         return "\n".join(summary_lines)
 

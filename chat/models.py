@@ -17,7 +17,9 @@ class Bot(models.Model):
         return f"Bot {self.id} {self.name} ({self.model})"
 
     def get_core_memories_for_prompt(self, n_last_memories=1000):
-        core_memories = self.core_memories.all().order_by("-timestamp")[:n_last_memories]
+        core_memories = self.core_memories.all().order_by("-timestamp")[
+            :n_last_memories
+        ]
         core_memories = [f"- {cm.memory}" for cm in core_memories]
         return "\n".join(core_memories)
 
@@ -33,7 +35,9 @@ class Trigger(models.Model):
 class Conversation(models.Model):
     id = models.AutoField(primary_key=True)
     uuid = models.UUIDField(default=uuid.uuid4, editable=False)
-    title = models.CharField(max_length=255, blank=True, null=True, default="New Conversation")
+    title = models.CharField(
+        max_length=255, blank=True, null=True, default="New Conversation"
+    )
     creation_date = models.DateTimeField(auto_now_add=True)
     title_update_date = models.DateTimeField(auto_now=True)
     participants = models.ManyToManyField("Participant", related_name="conversations")
@@ -43,10 +47,20 @@ class Conversation(models.Model):
         return f"Conversation {self.uuid} created on {self.creation_date}"
 
     def list_of_bots(self):
-        return ", ".join([participant.name() for participant in self.participants.filter(participant_type="bot")])
+        return ", ".join(
+            [
+                participant.name()
+                for participant in self.participants.filter(participant_type="bot")
+            ]
+        )
 
     def list_of_humans(self):
-        return ", ".join([participant.name() for participant in self.participants.filter(participant_type="user")])
+        return ", ".join(
+            [
+                participant.name()
+                for participant in self.participants.filter(participant_type="user")
+            ]
+        )
 
 
 class Participant(models.Model):
@@ -81,17 +95,27 @@ class Participant(models.Model):
 
 class Message(models.Model):
     id = models.AutoField(primary_key=True)
-    conversation = models.ForeignKey(Conversation, on_delete=models.CASCADE, related_name="messages")
-    participant = models.ForeignKey(Participant, on_delete=models.CASCADE, related_name="sent_messages")
+    conversation = models.ForeignKey(
+        Conversation, on_delete=models.CASCADE, related_name="messages"
+    )
+    participant = models.ForeignKey(
+        Participant, on_delete=models.CASCADE, related_name="sent_messages"
+    )
     timestamp = models.DateTimeField(auto_now_add=True)
-    triggered_bots = models.ManyToManyField(Bot, related_name="responded_messages", blank=True)
+    triggered_bots = models.ManyToManyField(
+        Bot, related_name="responded_messages", blank=True
+    )
     message = models.TextField()
 
     def __str__(self):
         return f"Message from {self.participant} at {self.timestamp} in conversation {self.conversation.uuid}"
 
     def participant_name(self):
-        return self.participant.user.username if self.participant.participant_type == "user" else self.participant.bot.name
+        return (
+            self.participant.user.username
+            if self.participant.participant_type == "user"
+            else self.participant.bot.name
+        )
 
 
 class LLMRequest(models.Model):
